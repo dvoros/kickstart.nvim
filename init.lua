@@ -108,7 +108,7 @@ vim.opt.number = true
 -- vim.opt.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
-vim.opt.mouse = ''
+vim.opt.mouse = 'a'
 
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
@@ -158,6 +158,9 @@ vim.opt.scrolloff = 10
 -- Clear highlights on search when pressing <Esc> in normal mode
 --  See `:help hlsearch`
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
+
+vim.keymap.set('n', '<leader>%', '<cmd>vsplit<cr>')
+vim.keymap.set('n', '<leader>"', '<cmd>split<cr>')
 
 -- Diagnostic keymaps
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
@@ -225,14 +228,14 @@ vim.opt.rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
-
   {
-
-    'ggandor/leap.nvim',
+    'm4xshen/autoclose.nvim',
     config = function()
-      require('leap').create_default_mappings()
+      require('autoclose').setup()
     end,
   },
+
+  'ggandor/leap.nvim',
 
   {
     'christoomey/vim-tmux-navigator',
@@ -567,6 +570,8 @@ require('lazy').setup({
           -- WARN: This is not Goto Definition, this is Goto Declaration.
           --  For example, in C this would take you to the header.
           map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
+          map('<leader>K', vim.diagnostic.open_float, 'Open Diagnostic Float')
 
           -- The following two autocommands are used to highlight references of the
           -- word under your cursor when your cursor rests there for a little while.
@@ -944,6 +949,13 @@ require('lazy').setup({
         additional_vim_regex_highlighting = { 'ruby' },
       },
       indent = { enable = true, disable = { 'ruby' } },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          node_incremental = 'v',
+          node_decremental = 'V',
+        },
+      },
     },
     -- There are additional nvim-treesitter modules that you can use to interact
     -- with nvim-treesitter. You should go explore a few and see what interests you:
@@ -966,19 +978,8 @@ require('lazy').setup({
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.neo-tree',
   -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
-
-  {
-    'nvim-neo-tree/neo-tree.nvim',
-    branch = 'v3.x',
-    dependencies = {
-      'nvim-lua/plenary.nvim',
-      'nvim-tree/nvim-web-devicons', -- not strictly required, but recommended
-      'MunifTanjim/nui.nvim',
-      -- "3rd/image.nvim", -- Optional image support in preview window: See `# Preview Mode` for more information
-    },
-  },
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
@@ -1011,6 +1012,9 @@ require('lazy').setup({
     },
   },
 })
+
+require('lspconfig').gleam.setup {}
+require('leap').create_default_mappings()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
